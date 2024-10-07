@@ -1,5 +1,4 @@
-// src/app/api/auth/[...nextauth]/route.ts
-import NextAuth, { AuthOptions } from "next-auth";
+import NextAuth from "next-auth";
 import { PrismaAdapter } from "@auth/prisma-adapter";
 import { PrismaClient } from "@prisma/client";
 import GoogleProvider from "next-auth/providers/google";
@@ -21,7 +20,8 @@ interface CustomSession extends Session {
   user: CustomUser;
 }
 
-export const authOptions: AuthOptions = {
+// Define the auth options
+export const authOptions = {
   adapter: PrismaAdapter(prisma),
   providers: [
     GoogleProvider({
@@ -32,7 +32,7 @@ export const authOptions: AuthOptions = {
   callbacks: {
     async session({ session, user }: { session: CustomSession; user: CustomUser }) {
       if (session.user) {
-        session.user.id = user.id; // Ensure user.id is set
+        session.user.id = user.id;
         session.user.firstName = user.firstName || null;
         session.user.lastName = user.lastName || null;
         session.user.dateOfBirth = user.dateOfBirth || null;
@@ -44,8 +44,8 @@ export const authOptions: AuthOptions = {
   },
 };
 
-// Create the NextAuth API handler
+// Create and export NextAuth handler for API routes
 const handler = NextAuth(authOptions);
 
-// Export the handler for GET and POST requests
+// Explicitly export the handler for both GET and POST
 export { handler as GET, handler as POST };
