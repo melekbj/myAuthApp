@@ -21,7 +21,7 @@ interface CustomSession extends Session {
 }
 
 // Define the auth options
-export const authOptions = {
+const authOptions = {
   adapter: PrismaAdapter(prisma),
   providers: [
     GoogleProvider({
@@ -44,8 +44,6 @@ export const authOptions = {
   },
 };
 
-// Create and export NextAuth handler for API routes
+// Export the NextAuth handler
 const handler = NextAuth(authOptions);
-
-// Explicitly export the handler for both GET and POST
 export { handler as GET, handler as POST };
