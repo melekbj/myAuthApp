@@ -1,10 +1,8 @@
 import NextAuth from "next-auth";
 import { PrismaAdapter } from "@auth/prisma-adapter";
-import { PrismaClient } from "@prisma/client";
 import GoogleProvider from "next-auth/providers/google";
 import type { Session, User } from "next-auth";
-
-const prisma = new PrismaClient();
+import prisma from "@/lib/prisma"; // Import the singleton Prisma client
 
 // Extend the User type to include your custom fields
 interface CustomUser extends User {
@@ -22,7 +20,7 @@ interface CustomSession extends Session {
 
 // Define the auth options
 const authOptions = {
-  adapter: PrismaAdapter(prisma),
+  adapter: PrismaAdapter(prisma), // Use the singleton Prisma client
   providers: [
     GoogleProvider({
       clientId: process.env.GOOGLE_CLIENT_ID!,
