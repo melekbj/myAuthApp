@@ -1,12 +1,27 @@
-import NextAuth from "next-auth";
+// src/app/api/auth/[...nextauth]/route.ts
+import NextAuth, { AuthOptions } from "next-auth";
 import { PrismaAdapter } from "@auth/prisma-adapter";
 import { PrismaClient } from "@prisma/client";
 import GoogleProvider from "next-auth/providers/google";
-import type { Session, User } from "next-auth"; // Import types
+import type { Session, User } from "next-auth";
 
 const prisma = new PrismaClient();
 
-const authOptions = {
+// Extend the User type to include your custom fields
+interface CustomUser extends User {
+  firstName?: string | null;
+  lastName?: string | null;
+  dateOfBirth?: string | null;
+  address?: string | null;
+  phoneNumber?: string | null;
+}
+
+// Extend the Session type to include the custom user
+interface CustomSession extends Session {
+  user: CustomUser;
+}
+
+export const authOptions: AuthOptions = {
   adapter: PrismaAdapter(prisma),
   providers: [
     GoogleProvider({
@@ -15,14 +30,14 @@ const authOptions = {
     }),
   ],
   callbacks: {
-    async session({ session, user }: { session: Session; user: User }) {
+    async session({ session, user }: { session: CustomSession; user: CustomUser }) {
       if (session.user) {
-        session.user.id = user.id; // Add user ID to the session
-        session.user.firstName = (user as any).firstName || null;
-        session.user.lastName = (user as any).lastName || null;
-        session.user.dateOfBirth = (user as any).dateOfBirth || null;
-        session.user.address = (user as any).address || null;
-        session.user.phoneNumber = (user as any).phoneNumber || null;
+        session.user.id = user.id; // Ensure user.id is set
+        session.user.firstName = user.firstName || null;
+        session.user.lastName = user.lastName || null;
+        session.user.dateOfBirth = user.dateOfBirth || null;
+        session.user.address = user.address || null;
+        session.user.phoneNumber = user.phoneNumber || null;
       }
       return session;
     },
